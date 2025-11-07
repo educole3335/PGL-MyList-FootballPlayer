@@ -44,9 +44,3 @@ Casos de borde
 
 - `category` no encontrada: el componente usa valores por defecto (`''` para icono y `#ccc` para color del borde).
 - `player.awards` vacío: se muestra `-`.
-
-Sugerencias
-
-- Añadir `TouchableOpacity` con ripple/feedback táctil en Android.
-- Agregar soporte para avatar con imagen (prop nueva `avatarUrl`).
-- Separar `Avatar` en un componente pequeño para reutilizar.
