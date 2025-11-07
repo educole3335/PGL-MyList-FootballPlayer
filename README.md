@@ -12,3 +12,5 @@ Esta aplicación es un gestor de mercado de jugadores de fútbol desarrollada co
 
 - [Diseño de la Interfaz](./docs/design.md)
 - [Diseño de PlayerItem](./docs/PlayerItem.md)
+- [Diseño de AddEditModal](./docs/AddEditModal.md)
+- [Diseño de App](./docs/App.md)
