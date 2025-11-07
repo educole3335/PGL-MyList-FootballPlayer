@@ -15,3 +15,16 @@ Esta aplicación es un gestor de mercado de jugadores de fútbol desarrollada co
 - [Diseño de AddEditModal](./docs/AddEditModal.md)
 - [Diseño de App](./docs/App.md)
 - [Explicacion de la implementacion](./docs/implementation.md)
+## Estructura del Proyecto
+
+```
+PGL-MyList-FootPlayer/
+├── App.tsx           # Componente principal
+├── src/
+│   └── types.ts     # Definiciones de tipos
+├── components/
+│   ├── PlayerItem.tsx    # Tarjeta de jugador
+│   └── AddEditModal.tsx  # Modal para añadir/editar
+└── docs/            # Documentación
+```
+![alt text](image.png)
