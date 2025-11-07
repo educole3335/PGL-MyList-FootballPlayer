@@ -8,3 +8,6 @@ Esta aplicación es un gestor de mercado de jugadores de fútbol desarrollada co
 - Añadir nuevos jugadores mediante un formulario modal
 - Editar jugadores existentes
 - Eliminar jugadores individualmente o todos a la vez
+## Documentación
+
+- [Diseño de la Interfaz](./docs/design.md)
