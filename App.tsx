@@ -9,9 +9,13 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import { v4 as uuidv4 } from "uuid";
+import { generateUUID } from "./src/utils/uuid";
+import AddEditModal from "./components/AddEditModal";
 import PlayerItem from "./components/PlayerItem";
-import type { Player, Category } from "./src/types/types";
+import type {
+  Player,
+  Category,
+} from "../PGL-MyList-FootballPlayer/src/types/types";
 
 const CATEGORIES: Category[] = [
   {
@@ -44,10 +48,10 @@ const CATEGORIES: Category[] = [
   },
 ];
 
-// Seed players para demostración
+// Seed players (real, public football players) to demonstrate the app
 const DEFAULT_PLAYERS: Player[] = [
   {
-    id: uuidv4(),
+    id: generateUUID(),
     name: "Lionel Messi",
     category: "del",
     price: 120000000,
@@ -57,19 +61,41 @@ const DEFAULT_PLAYERS: Player[] = [
     awards: "Ballon d'Or, Copa America",
   },
   {
-    id: uuidv4(),
+    id: generateUUID(),
     name: "Kevin De Bruyne",
     category: "mc",
     price: 90000000,
-    marked: false,
+    marked: true,
     position: "mc",
     team: "Manchester City",
     awards: "Premier League titles",
+  },
+  {
+    id: generateUUID(),
+    name: "Virgil van Dijk",
+    category: "def",
+    price: 75000000,
+    marked: false,
+    position: "def",
+    team: "Liverpool",
+    awards: "UEFA Champions League",
+  },
+  {
+    id: generateUUID(),
+    name: "Thibaut Courtois",
+    category: "gk",
+    price: 50000000,
+    marked: false,
+    position: "P",
+    team: "Real Madrid",
+    awards: "LaLiga, World Cup Golden Glove",
   },
 ];
 
 export default function App() {
   const [players, setPlayers] = useState<Player[]>(DEFAULT_PLAYERS);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editing, setEditing] = useState<Player | null>(null);
 
   // derived totals
   const totals = useMemo(() => {
@@ -79,6 +105,32 @@ export default function App() {
     const markedSum = marked.reduce((s, p) => s + Number(p.price || 0), 0);
     return { totalCount, markedCount, markedSum };
   }, [players]);
+
+  function openAdd() {
+    setEditing(null);
+    setModalVisible(true);
+  }
+
+  function openEdit(p: Player) {
+    setEditing(p);
+    setModalVisible(true);
+  }
+
+  function handleSave(data: Omit<Player, "id"> & { id?: string }) {
+    if (data.id) {
+      // edit
+      setPlayers((prev) =>
+        prev.map((p) => (p.id === data.id ? (data as Player) : p))
+      );
+    } else {
+      const newP: Player = {
+        ...(data as Omit<Player, "id">),
+        id: generateUUID(),
+      } as Player;
+      setPlayers((prev) => [newP, ...prev]);
+    }
+    setModalVisible(false);
+  }
 
   function handleDelete(id: string) {
     Alert.alert("Eliminar", "¿Eliminar este jugador?", [
@@ -95,6 +147,15 @@ export default function App() {
     setPlayers((prev) =>
       prev.map((p) => (p.id === id ? { ...p, marked: !p.marked } : p))
     );
+  }
+
+  function handleDeleteAll() {
+    if (players.length === 0) return;
+
+    Alert.alert("Borrar todo", "¿Borrar todos los jugadores?", [
+      { text: "Cancelar", style: "cancel" },
+      { text: "Borrar", style: "destructive", onPress: () => setPlayers([]) },
+    ]);
   }
 
   return (
@@ -135,13 +196,38 @@ export default function App() {
               player={item}
               categories={CATEGORIES}
               onToggle={() => handleToggle(item.id)}
-              onEdit={() => {}} // TODO: Implementar edición
+              onEdit={() => openEdit(item)}
               onDelete={() => handleDelete(item.id)}
             />
           )}
           style={styles.list}
         />
       )}
+
+      <View style={styles.actions}>
+        <TouchableOpacity style={styles.addBtn} onPress={openAdd}>
+          <Text style={styles.addBtnText}>Añadir</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.deleteAllBtn,
+            players.length === 0 && styles.disabledBtn,
+          ]}
+          onPress={handleDeleteAll}
+          disabled={players.length === 0}
+        >
+          <Text style={styles.deleteAllText}>Borrar todo</Text>
+        </TouchableOpacity>
+      </View>
+
+      <AddEditModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        onSave={handleSave}
+        categories={CATEGORIES}
+        initialValue={editing ?? undefined}
+      />
 
       <StatusBar style="auto" />
     </SafeAreaView>
@@ -198,5 +284,39 @@ const styles = StyleSheet.create({
   list: {
     flex: 1,
     width: "100%",
+  },
+  actions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 20,
+    width: "100%",
+    gap: 12,
+  },
+  addBtn: {
+    backgroundColor: "#4caf50", // Verde principal como en el diseño
+    padding: 15,
+    borderRadius: 8,
+    flex: 1,
+  },
+  addBtnText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  deleteAllBtn: {
+    backgroundColor: "#2196f3", // Azul para el botón de borrar como en el diseño
+    padding: 15,
+    borderRadius: 8,
+    flex: 1,
+  },
+  deleteAllText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  disabledBtn: {
+    opacity: 0.5,
   },
 });
